@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Restaurant Menu Manager</title>
+<style>
+:root{--bg:#f5f4ef;--card:#fff;--ink:#111512;--muted:#777;--line:#e7e5dd;--gold:#c58a3a;--danger:#b33a32}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans Lao",Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:760px;margin:auto;min-height:100vh}
+header{background:#111512;color:#fff;padding:22px 18px 25px;border-radius:0 0 28px 28px}
+.top{display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:11px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:var(--gold);display:grid;place-items:center;font-weight:900}.brand b{display:block}.brand small{color:#aeb3ad;font-size:10px}
+.manage{border:1px solid #444;background:#1d211e;color:#fff;border-radius:12px;padding:9px 12px;font-size:12px;font-weight:700}
+h1{font-size:29px;margin:25px 0 5px}.sub{color:#bfc3bf;font-size:12px}
+.search{margin:14px 18px;height:50px;background:#fff;border:1px solid var(--line);border-radius:16px;display:flex;align-items:center;padding:0 14px;gap:9px}
+.search input{border:0;outline:0;width:100%;background:none}
+.cats{display:flex;gap:8px;overflow:auto;padding:10px 18px;position:sticky;top:0;background:#f5f4efee;backdrop-filter:blur(12px);z-index:5}
+.cat{border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 15px;white-space:nowrap;font-size:12px}.cat.active{background:#111512;color:#fff}
+.content{padding:10px 18px 110px}.section{margin:20px 0 28px}.section h2{font-size:20px;margin:0 0 12px}
+.grid{display:grid;gap:12px}.item{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;display:flex;gap:13px;box-shadow:0 8px 25px #2221}
+.pic{width:105px;height:105px;flex:0 0 105px;border-radius:15px;background:#ebeae4;display:grid;place-items:center;color:#999;font-size:11px;text-align:center;overflow:hidden}.pic img{width:100%;height:100%;object-fit:cover}
+.details{flex:1;min-width:0}.name{font-weight:800;font-size:16px}.desc{color:var(--muted);font-size:11px;margin-top:5px}.bottom{display:flex;justify-content:space-between;align-items:center;margin-top:13px}.price{font-weight:900;font-size:15px}.add{border:0;background:#111512;color:#fff;border-radius:11px;padding:9px 13px;font-weight:800}
+.cart{position:fixed;bottom:13px;left:50%;transform:translateX(-50%);width:min(calc(100% - 28px),724px);background:#111512;color:#fff;border-radius:18px;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;z-index:20}.cart button{background:#fff;border:0;border-radius:12px;padding:10px 15px;font-weight:800}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:flex-end}.overlay.show{display:flex}
+.modal{background:#fff;width:min(100%,760px);margin:auto;border-radius:25px 25px 0 0;padding:19px;max-height:88vh;overflow:auto}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modal h2{font-size:20px;margin:0}.close{border:0;background:#eee;border-radius:11px;width:38px;height:38px;font-size:20px}
+
+.settings-grid{display:grid;gap:14px}
+.setting-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+.setting-title{font-size:14px;font-weight:900;margin-bottom:10px}
+.setting-desc{font-size:10px;color:#888;line-height:1.5;margin-bottom:10px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #f0efe9}
+.setting-row:last-child{border-bottom:0}
+.setting-label{font-size:12px;font-weight:700}
+.setting-label small{display:block;color:#999;font-weight:400;margin-top:3px}
+.switch{position:relative;width:44px;height:25px;flex:0 0 44px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#d9d8d1;border-radius:99px;transition:.2s}
+.slider:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px #0002}
+.switch input:checked+.slider{background:#111512}
+.switch input:checked+.slider:before{transform:translateX(19px)}
+.color-row{display:flex;gap:8px;flex-wrap:wrap}
+.color-choice{width:31px;height:31px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px #ddd;cursor:pointer}
+.color-choice.selected{box-shadow:0 0 0 2px #111512}
+.admin-profile{display:flex;align-items:center;gap:12px}
+.profile-logo{width:58px;height:58px;border-radius:17px;background:#111512;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:900}
+.form{display:grid;gap:12px}.label{font-size:12px;font-weight:800}.field{border:1px solid var(--line);border-radius:13px;padding:12px;outline:0;width:100%;background:#fff}.upload{border:1.5px dashed #c9c7bd;border-radius:16px;min-height:145px;display:grid;place-items:center;text-align:center;color:#888;overflow:hidden;position:relative}.upload img{width:100%;height:190px;object-fit:cover}.upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.primary{border:0;background:#111512;color:#fff;border-radius:14px;padding:13px;font-weight:900}.secondary{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px;font-weight:800}
+.admin-list{display:grid;gap:9px;margin-top:18px}.admin-row{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:14px}.admin-row img,.thumb{width:52px;height:52px;border-radius:10px;object-fit:cover;background:#eee}.admin-info{flex:1;min-width:0}.admin-info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-info small{color:#777}.del{border:0;background:#f9e8e6;color:var(--danger);border-radius:10px;padding:8px;font-weight:800}
+.notice{background:#f4efe5;border-radius:13px;padding:11px;font-size:11px;color:#74572d;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="top">
+    <div class="brand"><div class="logo">R</div><div><b id="shopName">ຊື່ຮ້ານອາຫານ</b><small> DIGITAL MENU</small></div></div>
+    <div style="display:flex;gap:7px"><button class="manage" id="settingsBtn">⚙ ຕັ້ງຄ່າ</button><button class="manage" id="manageBtn">＋ ຈັດການ</button></div>
+  </div>
+  <h1>ເມນູອາຫານ</h1>
+  <div class="sub">ເລືອກເມນູ ແລະເພີ່ມເຂົ້າລາຍການ</div>
+</header>
+<div class="search">⌕ <input id="search" placeholder="ຄົ້ນຫາເມນູ..."></div>
+<nav class="cats" id="cats">
+  <button class="cat active" data-filter="all">ທັງໝົດ</button>
+  <button class="cat" data-filter="food">ອາຫານ</button>
+  <button class="cat" data-filter="drink">ເຄື່ອງດື່ມ</button>
+  <button class="cat" data-filter="dessert">ຂອງຫວານ</button>
+</nav>
+<main class="content" id="menu"></main>
+<div class="cart"><div><small id="cartCount">0 ລາຍການ</small><b id="cartTotal">0 ກີບ</b></div><button id="cartBtn">ເບິ່ງລາຍການ</button></div>
+</div>
+
+<div class="overlay" id="overlay">
+<div class="modal">
+  <div class="modalhead"><h2 id="modalTitle">ຈັດການເມນູ</h2><button class="close" id="close">×</button></div>
+  <div id="modalContent"></div>
+</div>
+</div>
+
+<script>
+const KEY='restaurant_menu_v1';
+const defaultItems=[
+{id:1,name:'ເຂົ້າຜັດ',desc:'ເຂົ້າຜັດພ້ອມເຄື່ອງປຸງສົດ',price:35000,cat:'food',img:''},
+{id:2,name:'ເຝີ',desc:'ເຝີຮ້ອນໆ ພ້ອມຜັກສົດ',price:30000,cat:'food',img:''},
+{id:3,name:'ນ້ຳອັດລົມ',desc:'ນ້ຳອັດລົມເຢັນໆ',price:15000,cat:'drink',img:''}
+];
+let items=JSON.parse(localStorage.getItem(KEY)||'null')||defaultItems;
+let cart={};let filter='all';
+
+const money=n=>new Intl.NumberFormat('lo-LA').format(n)+' ກີບ';
+const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
+
+function render(){
+ const q=document.getElementById('search').value.trim().toLowerCase();
+ const groups={food:'ອາຫານ',drink:'ເຄື່ອງດື່ມ',dessert:'ຂອງຫວານ'};
+ let out='';
+ Object.entries(groups).forEach(([cat,title])=>{
+   if(filter!=='all'&&filter!==cat)return;
+   const list=items.filter(x=>x.cat===cat&&x.name.toLowerCase().includes(q));
+   if(!list.length)return;
+   out+=`<section class="section"><h2>${title}</h2><div class="grid">`;
+   list.forEach(x=>out+=`<article class="item">
+    <div class="pic">${x.img?`<img src="${x.img}" alt="">`:'ພື້ນທີ່ສຳລັບຮູບ'}</div>
+    <div class="details"><div class="name">${x.name}</div><div class="desc">${x.desc||''}</div>
+    <div class="bottom"><div class="price">${money(x.price)}</div><button class="add" onclick="addCart(${x.id})">+ ເພີ່ມ</button></div></div>
+   </article>`);
+   out+='</div></section>';
+ });
+ document.getElementById('menu').innerHTML=out||'<div style="text-align:center;color:#888;padding:45px">ບໍ່ພົບເມນູ</div>';
+}
+function addCart(id){const x=items.find(i=>i.id===id);if(!x)return;if(!cart[id])cart[id]={...x,qty:0};cart[id].qty++;refreshCart()}
+function refreshCart(){let n=0,t=0;Object.values(cart).forEach(x=>{n+=x.qty;t+=x.qty*x.price});document.getElementById('cartCount').textContent=n+' ລາຍການ';document.getElementById('cartTotal').textContent=money(t)}
+
+function openManager(){
+ document.getElementById('modalTitle').textContent='ຈັດການເມນູ';
+ document.getElementById('modalContent').innerHTML=`
+ <div class="notice">ຂໍ້ມູນເມນູຈະຖືກບັນທຶກໃນ Browser ນີ້ ແລະບໍ່ພຶ່ງພາຮູບຈາກເວັບພາຍນອກ. ສາມາດເພີ່ມຊື່, ລາຄາ, ໝວດໝູ່ ແລະອັບໂຫຼດຮູບໄດ້.</div>
+ <button class="primary" style="width:100%;margin-top:12px" id="addMenuBtn">＋ ເພີ່ມເມນູໃໝ່</button>
+ <div class="admin-list">${items.map(x=>`<div class="admin-row">
+ ${x.img?`<img class="thumb" src="${x.img}">`:`<div class="thumb"></div>`}
+ <div class="admin-info"><b>${x.name}</b><small>${money(x.price)} · ${x.cat}</small></div>
+ <button class="del" onclick="deleteItem(${x.id})">ລຶບ</button>
+ </div>`).join('')}</div>`;
+ document.getElementById('addMenuBtn').onclick=openAdd;
+ overlay.classList.add('show');
+}
+function openAdd(){
+ document.getElementById('modalTitle').textContent='ເພີ່ມເມນູ';
+ document.getElementById('modalContent').innerHTML=`
+ <form class="form" id="form">
+ <div><div class="label">ຊື່ເມນູ</div><input class="field" id="n" required placeholder="ເຊັ່ນ ເຂົ້າຜັດ"></div>
+ <div><div class="label">ລາຄາ (ກີບ)</div><input class="field" id="p" type="number" min="0" required placeholder="35000"></div>
+ <div><div class="label">ໝວດໝູ່</div><select class="field" id="c"><option value="food">ອາຫານ</option><option value="drink">ເຄື່ອງດື່ມ</option><option value="dessert">ຂອງຫວານ</option></select></div>
+ <div><div class="label">ລາຍລະອຽດ</div><input class="field" id="d" placeholder="ລາຍລະອຽດເມນູ"></div>
+ <div><div class="label">ຮູບເມນູ</div><label class="upload" id="uploadBox">ກົດເພື່ອເລືອກຮູບ
+ <input id="photo" type="file" accept="image/*"></label></div>
+ <button class="primary" type="submit">⬆ ອັບໂຫຼດ / ບັນທຶກເມນູ</button>
+ </form>`;
+ let image='';
+ document.getElementById('photo').onchange=e=>{
+   const f=e.target.files[0];if(!f)return;
+   const reader=new FileReader();reader.onload=ev=>{image=ev.target.result;document.getElementById('uploadBox').innerHTML=`<img src="${image}"><input id="photo" type="file" accept="image/*">`;document.getElementById('photo').onchange=arguments.callee};reader.readAsDataURL(f);
+ };
+ document.getElementById('form').onsubmit=e=>{
+   e.preventDefault();
+   items.push({id:Date.now(),name:n.value.trim(),price:Number(p.value),cat:c.value,desc:d.value.trim(),img:image});
+   save();render();openManager();
+ };
+}
+function deleteItem(id){if(confirm('ຕ້ອງການລຶບເມນູນີ້ບໍ?')){items=items.filter(x=>x.id!==id);save();render();openManager()}}
+document.getElementById('manageBtn').onclick=openManager;
+document.getElementById('close').onclick=()=>overlay.classList.remove('show');
+overlay.onclick=e=>{if(e.target===overlay)overlay.classList.remove('show')};
+document.getElementById('search').oninput=render;
+document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.filter;render()});
+document.getElementById('cartBtn').onclick=()=>{
+ document.getElementById('modalTitle').textContent='ລາຍການສັ່ງ';
+ let total=0;const list=Object.values(cart);
+ document.getElementById('modalContent').innerHTML=list.length?list.map(x=>{total+=x.qty*x.price;return `<div class="admin-row"><div class="admin-info"><b>${x.name}</b><small>${x.qty} × ${money(x.price)}</small></div><b>${money(x.qty*x.price)}</b></div>`}).join('')+`<div style="display:flex;justify-content:space-between;padding:17px 2px;font-weight:900">ລວມ <span>${money(total)}</span></div>`:'<div class="empty">ຍັງບໍ່ມີລາຍການ</div>';
+ overlay.classList.add('show');
+};
+
+const SETTINGS_KEY='restaurant_settings_v1';
+const defaultSettings={
+  shopName:'ຊື່ຮ້ານອາຫານ',
+  tagline:'RESTAURANT • DIGITAL MENU',
+  description:'ເລືອກເມນູ ແລະເພີ່ມເຂົ້າລາຍການ',
+  phone:'000 000 000',
+  address:'ທີ່ຢູ່ຮ້ານ',
+  open:'08:00',
+  close:'21:00',
+  currency:'ກີບ',
+  accent:'#c58a3a',
+  compact:false,
+  showSearch:true,
+  showCart:true,
+  showDescription:true
+};
+let settings=Object.assign({},defaultSettings,JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}'));
+
+function saveSettings(){
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+  applySettings();
+}
+function applySettings(){
+  document.getElementById('shopName').textContent=settings.shopName;
+  document.querySelector('header .sub').textContent=settings.tagline;
+  document.querySelector('header .sub').nextElementSibling; 
+  document.documentElement.style.setProperty('--gold',settings.accent);
+  document.querySelector('.search').style.display=settings.showSearch?'flex':'none';
+  document.querySelector('.cart').style.display=settings.showCart?'flex':'none';
+  document.querySelectorAll('.desc').forEach(x=>x.style.display=settings.showDescription?'':'none');
+  document.querySelectorAll('.item').forEach(x=>x.style.borderRadius=settings.compact?'14px':'20px');
+}
+function openSettings(){
+  document.getElementById('modalTitle').textContent='⚙ ຕັ້ງຄ່າໂປຣໄຟລ໌';
+  document.getElementById('modalContent').innerHTML=`
+  <div class="settings-grid">
+
+    <div class="setting-card">
+      <div class="setting-title">ໂປຣໄຟລ໌ຮ້ານ</div>
+      <div class="admin-profile">
+        <div class="profile-logo">R</div>
+        <div style="flex:1">
+          <input class="field" id="setShop" value="${settings.shopName}" placeholder="ຊື່ຮ້ານ">
+          <input class="field" id="setTag" style="margin-top:8px" value="${settings.tagline}" placeholder="ຄຳໂປຣຍສັ້ນ">
+        </div>
+      </div>
+      <input class="field" id="setDesc" style="margin-top:10px" value="${settings.description}" placeholder="ຄຳອະທິບາຍໜ້າເມນູ">
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-title">ຂໍ້ມູນຕິດຕໍ່</div>
+      <input class="field" id="setPhone" value="${settings.phone}" placeholder="ເບີໂທ">
+      <input class="field" id="setAddress" style="margin-top:9px" value="${settings.address}" placeholder="ທີ່ຢູ່ຮ້ານ">
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-title">ເວລາເປີດ-ປິດ</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+        <div><div class="setting-desc">ເປີດ</div><input class="field" id="setOpen" type="time" value="${settings.open}"></div>
+        <div><div class="setting-desc">ປິດ</div><input class="field" id="setClose" type="time" value="${settings.close}"></div>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-title">ສີຫຼັກຂອງຮ້ານ</div>
+      <div class="setting-desc">ເລືອກສີໃຫ້ເຂົ້າກັບ Brand</div>
+      <div class="color-row">
+        ${['#c58a3a','#b33a32','#356b59','#355c8a','#6b4d8a','#111512'].map(c=>`<button class="color-choice ${settings.accent===c?'selected':''}" data-color="${c}" style="background:${c}"></button>`).join('')}
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-title">ການສະແດງຜົນ</div>
+      <div class="setting-row"><div class="setting-label">ຊ່ອງຄົ້ນຫາ<small>ໃຫ້ລູກຄ້າຄົ້ນຫາເມນູ</small></div><label class="switch"><input id="setSearch" type="checkbox" ${settings.showSearch?'checked':''}><span class="slider"></span></label></div>
+      <div class="setting-row"><div class="setting-label">ຕະກ້າສັ່ງອາຫານ<small>ສະແດງລາຍການດ້ານລຸ່ມ</small></div><label class="switch"><input id="setCart" type="checkbox" ${settings.showCart?'checked':''}><span class="slider"></span></label></div>
+      <div class="setting-row"><div class="setting-label">ລາຍລະອຽດເມນູ<small>ເປີດ/ປິດຄຳອະທິບາຍ</small></div><label class="switch"><input id="setDescription" type="checkbox" ${settings.showDescription?'checked':''}><span class="slider"></span></label></div>
+      <div class="setting-row"><div class="setting-label">ໂໝດ Compact<small>ສະແດງເມນູໃຫ້ແນ່ນຂຶ້ນ</small></div><label class="switch"><input id="setCompact" type="checkbox" ${settings.compact?'checked':''}><span class="slider"></span></label></div>
+    </div>
+
+    <div class="setting-card">
+      <div class="setting-title">ສະກຸນເງິນ</div>
+      <select class="field" id="setCurrency"><option ${settings.currency==='ກີບ'?'selected':''}>ກີບ</option><option ${settings.currency==='฿'?'selected':''}>฿</option><option ${settings.currency==='$'?'selected':''}>$</option></select>
+    </div>
+
+    <button class="primary" id="saveSettingsBtn">✓ ບັນທຶກການຕັ້ງຄ່າ</button>
+    <button class="secondary" id="resetSettingsBtn">↺ ຄືນຄ່າເລີ່ມຕົ້ນ</button>
+  </div>`;
+
+  document.querySelectorAll('.color-choice').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.color-choice').forEach(x=>x.classList.remove('selected'));
+    b.classList.add('selected');settings.accent=b.dataset.color;
+  });
+
+  document.getElementById('saveSettingsBtn').onclick=()=>{
+    settings.shopName=document.getElementById('setShop').value.trim()||defaultSettings.shopName;
+    settings.tagline=document.getElementById('setTag').value.trim()||defaultSettings.tagline;
+    settings.description=document.getElementById('setDesc').value.trim();
+    settings.phone=document.getElementById('setPhone').value.trim();
+    settings.address=document.getElementById('setAddress').value.trim();
+    settings.open=document.getElementById('setOpen').value;
+    settings.close=document.getElementById('setClose').value;
+    settings.currency=document.getElementById('setCurrency').value;
+    settings.showSearch=document.getElementById('setSearch').checked;
+    settings.showCart=document.getElementById('setCart').checked;
+    settings.showDescription=document.getElementById('setDescription').checked;
+    settings.compact=document.getElementById('setCompact').checked;
+    saveSettings();
+    overlay.classList.remove('show');
+  };
+
+  document.getElementById('resetSettingsBtn').onclick=()=>{
+    settings=Object.assign({},defaultSettings);saveSettings();openSettings();
+  };
+  overlay.classList.add('show');
+}
+document.getElementById('settingsBtn').onclick=openSettings;
+applySettings();
+
+render();refreshCart();
+</script>
+</body>
+</html>
